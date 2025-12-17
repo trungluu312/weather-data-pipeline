@@ -1,0 +1,14 @@
+# Core dependencies
+requests==2.31.0
+pandas==2.1.4
+psycopg2-binary==2.9.9
+sqlalchemy==2.0.23
+python-dotenv==1.0.0
+
+# Geospatial
+geopandas==0.14.1
+shapely==2.0.2
+
+# Utilities
+jupyter==1.0.0
+notebook==7.0.6
