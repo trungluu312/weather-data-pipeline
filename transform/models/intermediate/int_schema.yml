@@ -1,0 +1,55 @@
+version: 2
+
+models:
+  - name: int_station_location_map
+    description: "Mapping of postal codes to nearest active stations"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - postal_code
+            - wmo_station_id
+    columns:
+      - name: postal_code
+        tests:
+          - not_null
+      - name: wmo_station_id
+        tests:
+          - not_null
+      - name: station_rank
+        tests:
+          - not_null
+
+  - name: int_cleaned_observations
+    description: "Cleaned observations with one row per postal code per wmo_station_id per hour"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - postal_code
+            - observation_hour
+            - wmo_station_id
+    columns:
+      - name: temperature
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: -60.0
+              max_value: 60.0
+      - name: relative_humidity
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+
+  - name: int_cleaned_forecasts
+    description: "Cleaned forecasts with one row per postal code per wmo_station_id per hour"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - postal_code
+            - forecast_hour
+            - wmo_station_id
+    columns:
+      - name: temperature
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: -60.0
+              max_value: 60.0

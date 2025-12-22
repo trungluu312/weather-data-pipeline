@@ -1,0 +1,9 @@
+weather_analytics:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('DUCKDB_PATH', '/app/data/weather_pipeline.db') }}"
+      extensions:
+        - spatial
+        - httpfs

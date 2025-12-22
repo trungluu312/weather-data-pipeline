@@ -1,22 +1,31 @@
-# Environment
-.env
-*.env
-
 # Python
 __pycache__/
-*.pyc
-venv/
+*.py[cod]
+*.so
 .venv/
+notebooks/
+venv/
+env/
 
-# Data
-*.csv
-*.parquet
-data/
+# Environment
+.env
+.env.local
 
 # Logs
+logs/
 *.log
 
-# IDE
-.vscode/
-.idea/
+# dbt
+transform/target/
+transform/logs/
+transform/dbt_packages/
+transform/.user.yml
+
+# Project Data & Artifacts
+data/
+docs_output/
+
+# IDE & OS
 .DS_Store
+.idea/
+.vscode/

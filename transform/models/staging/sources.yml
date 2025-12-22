@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: weather
+    database: weather_pipeline
+    schema: raw
+    tables:
+      - name: weather_stations
+      - name: weather_observations
+      - name: weather_forecasts
+      - name: postal_codes

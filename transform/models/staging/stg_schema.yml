@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: stg_observations
+    description: "Raw weather observations from BrightSky API"
+    columns:
+      - name: wmo_station_id
+        description: "WMO Station ID"
+        tests:
+          - not_null
+      - name: timestamp
+        description: "Observation timestamp"
+        tests:
+          - not_null
+
+  - name: stg_forecasts
+    description: "Raw weather forecasts from BrightSky API"
+    columns:
+      - name: wmo_station_id
+        tests:
+          - not_null
+      - name: forecast_timestamp
+        tests:
+          - not_null
+
+  - name: stg_stations
+    columns:
+      - name: wmo_station_id
+        tests:
+          - not_null
+      - name: geometry
+        tests:
+          - not_null
+
+  - name: stg_postal_codes
+    columns:
+      - name: postal_code
+        tests:
+          - unique
+          - not_null

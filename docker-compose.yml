@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  weather-app:
+    build: .
+    image: weather-data-pipeline:latest
+    container_name: weather_pipeline
+    environment:
+      # Data Persistence
+      DUCKDB_PATH: /app/data/weather_pipeline.db
+
+      # Configuration
+      BRIGHTSKY_API_URL: https://api.brightsky.dev
+      LOG_LEVEL: INFO
+
+      # dbt Configuration
+      DBT_PROFILES_DIR: /app/transform
+    volumes:
+      # Persist the database to host filesystem
+      - ./data:/app/data
+      # Mount local code for development
+      - ./orchestration:/app/orchestration
+      - ./ingestion:/app/ingestion
+      - ./transform:/app/transform
+      - ./common:/app/common
+      - ./scripts:/app/scripts
+    restart: unless-stopped
+
+volumes:
+  duckdb_data:

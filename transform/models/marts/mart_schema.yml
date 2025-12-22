@@ -1,0 +1,72 @@
+version: 2
+
+models:
+  - name: mart_hourly_observations_pcode
+    description: "ML-Ready Feature Set: Hourly weather observations by postal code."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - postal_code
+            - observation_hour
+    columns:
+      - name: postal_code
+        tests:
+          - not_null
+      - name: observation_hour
+        tests:
+          - not_null
+      - name: temperature
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: -60.0
+              max_value: 60.0
+      - name: precipitation
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 1000
+      - name: relative_humidity
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      - name: wind_speed
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 200
+
+  - name: mart_hourly_forecasts_pcode
+    description: "ML-Ready Feature Set: Hourly weather forecasts by postal code."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - postal_code
+            - forecast_hour
+    columns:
+      - name: postal_code
+        tests:
+          - not_null
+      - name: forecast_hour
+        tests:
+          - not_null
+      - name: temperature
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: -60.0
+              max_value: 60.0
+      - name: precipitation
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 1000
+      - name: relative_humidity
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      - name: wind_speed
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 200
