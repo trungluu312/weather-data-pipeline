@@ -17,15 +17,19 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 GEOJSON_URL = "https://github.com/yetzt/postleitzahlen/releases/download/2025.12/postleitzahlen.geojson.br"
-BERLIN_PREFIXES = ("10", "12", "13", "14")
+BERLIN_PREFIXES = ("10", "12", "13")
 
 def main():
     logger.info("Starting Postal Code Ingestion...")
     
     logger.info(f"Downloading from {GEOJSON_URL}")
-    resp = requests.get(GEOJSON_URL)
+    resp = requests.get(GEOJSON_URL, stream=True)
     resp.raise_for_status()
-    data = json.loads(brotli.decompress(resp.content))
+    
+    # Decompress on the fly
+    decompressed = brotli.decompress(resp.content)
+    data = json.loads(decompressed)
+    del decompressed # Free memory immediately
 
     # Filter for Berlin
     features = []

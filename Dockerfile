@@ -35,4 +35,4 @@ RUN mkdir -p /app/data /app/logs
 # Install dbt dependencies (needs to run in the final image as it writes to ./transform/dbt_packages)
 RUN python -m dbt.cli.main deps --profiles-dir transform --project-dir transform
 
-CMD ["python", "-m", "orchestration.flow"]
+CMD ["python", "-m", "orchestration.deploy"]
