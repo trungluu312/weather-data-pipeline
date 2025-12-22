@@ -1,11 +1,11 @@
 # 🌩️ Weather Data Pipeline
 
-**Goal:** Provide clean, reliable hourly weather data (observations & forecasts) for any ZIP code in Berlin, ready for Machine Learning.
+**Goal:** Provide clean, reliable hourly weather data (observations & forecasts) for any ZIP code in Berlin (10xxx, 12xxx, 13xxx), ready for Machine Learning.
 
 ---
 
 ## 🚀 How to Run It
-This project is fully containerized. You only need Docker.
+This project is fully containerized, find it in docker Hub
 
 ### 1. Start from Scratch
 Initialize the database and build the environment:
@@ -39,38 +39,44 @@ make dbt-docs
 
 **Our Solution:**
 1.  **Ingest**: We download raw weather data from the BrightSky API and postal code shapes from GitHub.
-2.  **Map**: We automatically find the 10 nearest active stations for every postal code.
+2.  **Map**: We automatically find the 10 nearest active stations for every postal code to ensure the minimum missing data.
 3.  **Heal**: If a station is missing data, we fill the gap using:
     *   *Spatial Fallback*: Data from the next closest station.
     *   *Temporal Fallback*: Data from the previous hour (if no stations are online).
 
-**Result**: A perfect, unbroken timeline of weather for every ZIP code.
+**Result**: Should provide an unbroken timeline of weather for every ZIP code.
 
 ---
 
 ## 🛠️ Tech Stack & Decisions
-We chose tools that are **simple to start** but **ready to scale**.
-
-| Tool | Why we picked it |
+| Tool | Why I picked it |
 | :--- | :--- |
-| **DuckDB** | Faster than Postgres for analytics, zero setup, runs on your laptop. |
-| **dbt** | Handles the complex SQL logic (staging-intermediate-marts) and data testing. |
-| **Prefect** | Orchestrates the Python scripts. |
-| **Docker** | Containerizes the environment. |
+| **DuckDB** | Embedded, faster to setup than Postgres, support SPATIAL extension that can handle geospatial data. |
+| **dbt** | Handles the complex SQL logic (staging-intermediate-marts) and data testing. Industry standard for data transformation. |
+| **Prefect** | Orchestrates the Python scripts, easier to setup than Airflow. |
+| **Docker** | Containerizes the environment, makes it easy to share and deploy. |
 
 ---
 
-## 🏭 Road to Production
+## 🏭 Productionize?
 
-If we needed to scale this, here is the plan:
+If we needed to productionize this, here is the plan:
 
 **1. Move away from custom Scripts to managed Connectors**
 *   *Current*: Custom Python scripts.
-*   *Future*: **Airbyte**.
+*   *Future*: **Airbyte** or any managed connectors. Or can continue with custom scripts but need to setup a CI/CD pipeline.    
 
 **2. Move away from File-Based to Cloud Warehouse**
 *   *Current*: DuckDB (Local file).
 *   *Future*: **BigQuery** or any other cloud warehouse. Separates storage from compute so we can crunch petabytes of data.
+
+**3. Airflow**
+*   *Current*: Prefect.
+*   *Future*: Can continue with Prefect or switch to **Airflow** MWAA if current tech stack is AWS heavy.
+
+**4. CI/CD**
+*   *Current*: None.
+*   *Future*: Can continue with None or switch to **GitHub Actions** or **GitLab CI**.
 
 ---
 

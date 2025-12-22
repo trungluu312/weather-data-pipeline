@@ -1,11 +1,12 @@
-.PHONY: help build reset-db pipeline dbt-docs transform
+.PHONY: help build reset-db pipeline serve dbt-docs transform
 
 help:
 	@echo "Weather Pipeline - Commands:"
 	@echo "  make build       - Build the Docker image (Required first step)"
 	@echo "  make publish     - Build & Push Universal Image (works on Win/Mac)"
 	@echo "  make reset-db    - Reset database to clean state"
-	@echo "  make pipeline    - Run the full ingestion and transformation pipeline"
+	@echo "  make pipeline    - Run the full ingestion and transformation pipeline once"
+	@echo "  make serve       - Run the pipeline on an hourly schedule (Long-running)"
 	@echo "  make transform   - Run only dbt transformations"
 	@echo "  make dbt-docs    - Generate and serve project documentation"
 
@@ -24,8 +25,12 @@ reset-db:
 	@echo "Database cleared. Run 'make pipeline' to re-initialize and ingest data."
 
 pipeline:
-	@echo "Triggering pipeline run..."
+	@echo "Triggering one-off pipeline run..."
 	docker-compose run --rm weather-app python -m orchestration.flow
+
+serve:
+	@echo "Starting hourly automated pipeline..."
+	docker-compose run --rm weather-app python -m orchestration.deploy
 
 transform:
 	@echo "Running dbt transformations..."
