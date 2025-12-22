@@ -19,7 +19,7 @@ def weather_pipeline_flow():
     2. Ingest Observations & Forecasts (Parallel)
     3. Run dbt transformations (Dependent on ingestion)
     """
-    print("🚀 Starting Weather Pipeline Flow")
+    print("🚀 Starting Weather Pipeline execution...")
     
     # 0. Initialize DB (Auto-heal for fresh containers)
     task_init_db()
