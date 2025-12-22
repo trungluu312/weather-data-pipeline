@@ -24,8 +24,8 @@ class Settings(BaseSettings):
     max_distance_m: int = 50000
     
     # Pipeline Config
-    observation_lookback_days: int = 7
-    forecast_horizon_days: int = 7
+    observation_lookback_days: int = 30
+    forecast_horizon_days: int = 10
     
     # Schedule
     observation_schedule: str = "0 * * * *"
