@@ -64,7 +64,7 @@ If we needed to productionize this, here is the plan:
 
 **1. Move away from custom Scripts to managed Connectors**
 *   *Current*: Custom Python scripts.
-*   *Future*: **Airbyte** or any managed connectors. Or can continue with custom scripts but need to setup a CI/CD pipeline.    
+*   *Future*: **Airbyte** or any managed connectors. Or can continue with custom scripts and orchestration tool but need to setup a CI/CD pipeline.    
 
 **2. Move away from File-Based to Cloud Warehouse**
 *   *Current*: DuckDB (Local file).
