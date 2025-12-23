@@ -5,6 +5,8 @@ services:
     build: .
     image: weather-data-pipeline:latest
     container_name: weather_pipeline
+    ports:
+      - "4200:4200"
     environment:
       # Data Persistence
       DUCKDB_PATH: /app/data/weather_pipeline.db
@@ -24,6 +26,7 @@ services:
       - ./transform:/app/transform
       - ./common:/app/common
       - ./scripts:/app/scripts
+      - ./logs:/app/logs
     restart: unless-stopped
 
 volumes:

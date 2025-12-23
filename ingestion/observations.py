@@ -1,8 +1,5 @@
 """
 Weather observations ingestion pipeline.
-
-Fetches weather data from BrightSky API and loads it into DuckDB.
-Refactored for simplicity and efficiency with explicit schema definition.
 """
 import logging
 import duckdb
@@ -15,7 +12,6 @@ from ingestion import brightsky_client
 logging.basicConfig(level=settings.log_level)
 logger = logging.getLogger(__name__)
 
-
 class ObservationsIngestion:
     
     def __init__(self, db_path: str = None):
@@ -24,23 +20,20 @@ class ObservationsIngestion:
 
     def run(self):
         logger.info("Starting Observations Ingestion...")
-        
         conn = duckdb.connect(self.db_path)
+        
         try:
-            
             try:
                 stations_df = conn.execute("""
                     SELECT id AS station_id, station_name, wmo_station_id 
                     FROM raw.weather_stations 
-                    WHERE wmo_station_id IS NOT NULL
+                    WHERE wmo_station_id IS NOT NULL AND last_record >= '2025-09-01'
                 """).fetchdf()
             except Exception as e:
-                logger.error(f"Failed to query stations: {e}. Run stations.py first.")
+                logger.error(f"Failed to query stations: {e}")
                 return
 
             stations = stations_df.to_dict('records')
-            logger.info(f"Found {len(stations)} stations with WMO ID")
-            
             total_records = 0
 
             for s in stations:
@@ -48,70 +41,72 @@ class ObservationsIngestion:
                 wmo_id = s['wmo_station_id']
                 station_id = s['station_id']
 
-                # Determine time range
-                start_date = self._get_start_date(conn, station_id)
-                if not start_date:
-                    start_date = datetime.now(timezone.utc) - timedelta(days=7)
-                    logger.info(f"[{station_name}] Backfill (7 days)")
+                # 1. Determine constraints
+                last_ts = self._get_last_timestamp(conn, station_id)
+                # DuckDB returns naive datetime for TIMESTAMP, so we enforce UTC
+                if last_ts and last_ts.tzinfo is None:
+                    last_ts = last_ts.replace(tzinfo=timezone.utc)
+                
+                now_utc = datetime.now(timezone.utc)
+                
+                if last_ts:
+                    start_date = last_ts
+                    mode = "Incremental"
                 else:
-                    logger.debug(f"[{station_name}] Incremental from {start_date}")
-
-                # API Request window (include current partial day)
-                end_date_str = (datetime.now(timezone.utc)).isoformat()
-                start_date_str = start_date.isoformat()
+                    start_date = now_utc - timedelta(days=settings.observation_lookback_days)
+                    mode = "Backfill"
 
                 try:
                     data = brightsky_client.get_weather(
                         wmo_station_id=wmo_id,
-                        date=start_date_str,
-                        last_date=end_date_str
+                        date=start_date.isoformat(),
+                        last_date=now_utc.isoformat()
                     )
                     
                     weather_list = data.get('weather', [])
                     if not weather_list:
                         continue
 
-                    # Filter future records
-                    now = datetime.now(timezone.utc)
-                    valid_obs = [
-                        w for w in weather_list 
-                        if datetime.fromisoformat(w['timestamp'].replace('Z', '+00:00')) <= now
-                    ]
+                    df_obs = pd.DataFrame(weather_list)
                     
-                    if not valid_obs:
-                        continue
+                    df_obs['timestamp'] = pd.to_datetime(df_obs['timestamp'])
+                    
+                    if last_ts:
+                        df_obs = df_obs[df_obs['timestamp'] > last_ts]
+                    
+                    df_obs = df_obs[df_obs['timestamp'] <= now_utc]
 
-                    df_obs = pd.DataFrame(valid_obs)
+                    if df_obs.empty:
+                        continue
                     df_obs['station_id'] = station_id 
                     df_obs['wmo_station_id'] = wmo_id 
-                    
                     if 'fallback_source_ids' in df_obs.columns:
                          df_obs['fallback_source_ids'] = df_obs['fallback_source_ids'].astype(str)
-
                     conn.register('df_batch', df_obs)
                     conn.execute("INSERT INTO raw.weather_observations BY NAME SELECT * FROM df_batch")
+                    conn.unregister('df_batch')
                     
                     count = len(df_obs)
                     total_records += count
+                    logger.info(f"[{station_name}] {mode}: +{count} records")
                     
                 except Exception as e:
                     logger.error(f"Failed {station_name}: {e}")
                     continue
             
-            logger.info(f"✅ Ingestion Complete. Total records ingested this run: {total_records}")
+            logger.info(f"✅ Ingestion Complete. Total new: {total_records}")
+            return total_records
 
         finally:
             conn.close()
 
-    def _get_start_date(self, conn, station_id):
+    def _get_last_timestamp(self, conn, station_id):
         try:
-            last_ts = conn.execute(
+            res = conn.execute(
                 "SELECT MAX(timestamp) FROM raw.weather_observations WHERE station_id = ?", 
                 [station_id]
-            ).fetchone()[0]
-            
-            if last_ts:
-                return last_ts - timedelta(hours=1)
+            ).fetchone()
+            return res[0] if res else None
         except Exception:
             return None
 

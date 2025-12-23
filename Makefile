@@ -29,8 +29,12 @@ pipeline:
 	docker-compose run --rm weather-app python -m orchestration.flow
 
 serve:
-	@echo "Starting hourly automated pipeline..."
-	docker-compose run --rm weather-app python -m orchestration.deploy
+	@echo "Starting automated pipeline (Server + Worker)..."
+	@echo "Prefect UI will be available at http://localhost:4200"
+	docker-compose up
+
+stop:
+	docker-compose down
 
 transform:
 	@echo "Running dbt transformations..."

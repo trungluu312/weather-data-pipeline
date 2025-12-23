@@ -16,7 +16,7 @@ distances as (
         p.postal_code,
         ST_Distance_Sphere(s.geometry, ST_Centroid(p.geometry)) as dist
     from stations s
-    inner join valid_stations_with_temp v on s.wmo_station_id = v.wmo_station_id
+    inner join valid_stations_with_temp v on s.wmo_station_id = v.wmo_station_id -- there are stations without any valid records
     cross join postal_codes p
     where ST_Distance_Sphere(s.geometry, ST_Centroid(p.geometry)) <= 15000 
     -- Max search radius 15km for nearby stations in case of missing data or no stations in the area

@@ -35,8 +35,10 @@ def weather_pipeline_flow():
     fcst_future = task_ingest_forecasts.submit()
     
     # Wait for completion before transformation
-    obs_future.wait()
-    fcst_future.wait()
+    obs_count = obs_future.result()
+    fcst_count = fcst_future.result()
+    
+    print(f"📊 Pipeline Summary: Ingested {obs_count} observations and {fcst_count} forecasts.")
     
     # 3. Transform
     task_transform_data()
