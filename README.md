@@ -31,6 +31,23 @@ make transform
 make dbt-docs
 ```
 
+### 5. Run on a New Machine (No Code Required)
+If you just want to run the pipeline on a server or another laptop without cloning the code, use the pre-built image:
+
+```bash
+# 1. Create a directory for data persistence
+mkdir -p weather-data
+
+# 2. Run the container
+docker run -d \
+  --name weather-pipeline \
+  -p 4200:4200 \
+  -v $(pwd)/weather-data:/app/data \
+  -e DUCKDB_PATH=/app/data/weather_pipeline.db \
+  trungluu1/weather-data-pipeline:v1
+```
+*Note: The Prefect UI will be available at http://localhost:4200*
+
 ---
 
 ## � What Problem Does This Solve?
