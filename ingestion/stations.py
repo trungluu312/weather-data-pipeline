@@ -11,7 +11,7 @@ from typing import List, Dict
 from common.config import settings
 from ingestion import brightsky_client
 
-logging.basicConfig(level=settings.log_level)
+
 logger = logging.getLogger(__name__)
 
 

@@ -13,11 +13,10 @@ from shapely.geometry import shape
 
 from common.config import settings
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 GEOJSON_URL = "https://github.com/yetzt/postleitzahlen/releases/download/2025.12/postleitzahlen.geojson.br"
-BERLIN_PREFIXES = ("10", "12", "13")
+BERLIN_PREFIXES = settings.berlin_postal_prefixes
 
 def main():
     logger.info("Starting Postal Code Ingestion...")

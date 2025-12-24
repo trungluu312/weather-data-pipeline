@@ -28,6 +28,3 @@ services:
       - ./scripts:/app/scripts
       - ./logs:/app/logs
     restart: unless-stopped
-
-volumes:
-  duckdb_data:

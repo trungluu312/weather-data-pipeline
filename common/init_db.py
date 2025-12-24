@@ -123,9 +123,7 @@ def init_database(db_path: str = None):
         """)
         
         # Create sequences for auto-incrementing IDs
-        conn.execute("""
-            CREATE SEQUENCE IF NOT EXISTS raw.weather_observations_id_seq START 1
-        """)
+
         conn.execute("""
             CREATE SEQUENCE IF NOT EXISTS raw.weather_forecasts_id_seq START 1
         """)
