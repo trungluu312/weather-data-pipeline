@@ -99,7 +99,7 @@ class ForecastsIngestion:
                     total_records += count
                     
                 except Exception as e:
-                    logger.error(f"Failed {name}: {e}")
+                    logger.warning(f"Failed {name}: {e}")
                     continue
             
             logger.info(f"✅ Ingestion Complete. Total new forecasts: {total_records}")

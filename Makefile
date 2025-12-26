@@ -11,7 +11,7 @@ help:
 	@echo "  make dbt-docs    - Generate and serve project documentation"
 
 build:
-	docker-compose build
+	docker compose build
 
 publish:
 	@echo "Building and Pushing Universal Image (amd64 + arm64)..."
@@ -19,34 +19,34 @@ publish:
 
 reset-db:
 	@echo "Resetting Database..."
-	docker-compose down -v
+	docker compose down -v
 	rm -rf data/*.db data/*.db.wal data/*.tmp
 	docker system prune -f
 	@echo "Database cleared. Run 'make pipeline' to re-initialize and ingest data."
 
 pipeline:
 	@echo "Triggering one-off pipeline run..."
-	docker-compose run --rm weather-app python -m orchestration.flow
+	docker compose run --rm weather-app python -m orchestration.flow
 
 serve:
 	@echo "Starting automated pipeline (Server + Worker)..."
 	@echo "Prefect UI will be available at http://localhost:4200"
-	docker-compose up
+	docker compose up
 
 stop:
-	docker-compose down
+	docker compose down
 
 transform:
 	@echo "Running dbt transformations..."
-	docker-compose run --rm weather-app bash -c "cd transform && python -m dbt.cli.main deps --profiles-dir . && python -m dbt.cli.main build --profiles-dir ."
+	docker compose run --rm weather-app bash -c "cd transform && python -m dbt.cli.main deps --profiles-dir . && python -m dbt.cli.main build --profiles-dir ."
 
 
 dbt-docs:
-	docker-compose run --rm weather-app python -m dbt.cli.main docs generate --profiles-dir transform --project-dir transform
+	docker compose run --rm weather-app python -m dbt.cli.main docs generate --profiles-dir transform --project-dir transform
 	@mkdir -p docs_output
-	@docker-compose run --rm -v $(PWD)/docs_output:/output weather-app cp transform/target/index.html /output/index.html
-	@docker-compose run --rm -v $(PWD)/docs_output:/output weather-app cp transform/target/catalog.json /output/catalog.json
-	@docker-compose run --rm -v $(PWD)/docs_output:/output weather-app cp transform/target/manifest.json /output/manifest.json
+	@docker compose run --rm -v $(PWD)/docs_output:/output weather-app cp transform/target/index.html /output/index.html
+	@docker compose run --rm -v $(PWD)/docs_output:/output weather-app cp transform/target/catalog.json /output/catalog.json
+	@docker compose run --rm -v $(PWD)/docs_output:/output weather-app cp transform/target/manifest.json /output/manifest.json
 	@echo "Documentation generated in 'docs_output/'."
 	@echo "Serving at http://localhost:8080..."
 	@python3 -m http.server 8080 --directory docs_output

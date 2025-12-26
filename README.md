@@ -5,7 +5,9 @@
 ---
 
 ## 🚀 How to Run It
-This project is fully containerized, find it in docker Hub
+
+### Prerequisites
+- **Docker** installed and running on your machine.
 
 ### 1. Start from Scratch
 Initialize the database and build the environment:

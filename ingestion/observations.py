@@ -91,7 +91,7 @@ class ObservationsIngestion:
                     logger.info(f"[{station_name}] {mode}: +{count} records")
                     
                 except Exception as e:
-                    logger.error(f"Failed {station_name}: {e}")
+                    logger.warning(f"Failed {station_name}: {e}")
                     continue
             
             logger.info(f"✅ Ingestion Complete. Total new: {total_records}")
